@@ -27,16 +27,38 @@ jobs:
     - name: Clone matching Configurations
       run: git clone --depth 1 --branch release-2.1.2.6 https://github.com/MarlinFirmware/Configurations.git
 
-    - name: Prepare configuration
+    - name: Prepare clean configuration
       run: |
-        # Start with official Ender-3 Pro + Creality 4.2.2 example
+        # Official Ender-3 Pro + Creality 4.2.2
         cp -r "Configurations/config/examples/Creality/Ender-3 Pro/CrealityV422/." Marlin/Marlin/
-        
-        # Overwrite with your custom files
-        cp Configuration.h Marlin/Marlin/
-        cp Configuration_adv.h Marlin/Marlin/
-        cp _Bootscreen.h Marlin/Marlin/ 2>/dev/null || true
-        cp _Statusscreen.h Marlin/Marlin/ 2>/dev/null || true
+
+        cd Marlin/Marlin
+
+        # === Enable CR Touch / BLTouch ===
+        sed -i 's|//#define BLTOUCH|#define BLTOUCH|' Configuration.h
+        sed -i 's|//#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN|#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN|' Configuration.h
+        sed -i 's|//#define USE_PROBE_FOR_Z_HOMING|#define USE_PROBE_FOR_Z_HOMING|' Configuration.h
+        sed -i 's|//#define Z_SAFE_HOMING|#define Z_SAFE_HOMING|' Configuration.h
+
+        # Probe Offset Wizard
+        sed -i 's|//#define PROBE_OFFSET_WIZARD|#define PROBE_OFFSET_WIZARD|' Configuration.h
+
+        # Auto Bed Leveling (Bilinear)
+        sed -i 's|//#define AUTO_BED_LEVELING_BILINEAR|#define AUTO_BED_LEVELING_BILINEAR|' Configuration.h
+        sed -i 's|//#define RESTORE_LEVELING_AFTER_G28|#define RESTORE_LEVELING_AFTER_G28|' Configuration.h
+        sed -i 's|//#define ENABLE_LEVELING_AFTER_G28|#define ENABLE_LEVELING_AFTER_G28|' Configuration.h
+
+        # Babystepping
+        sed -i 's|//#define BABYSTEPPING|#define BABYSTEPPING|' Configuration.h
+        sed -i 's|//#define BABYSTEP_MULTIPLICATOR_Z  1|#define BABYSTEP_MULTIPLICATOR_Z  1|' Configuration.h
+        sed -i 's|//#define DOUBLECLICK_FOR_Z_BABYSTEPPING|#define DOUBLECLICK_FOR_Z_BABYSTEPPING|' Configuration.h
+
+        # Higher max temperatures (safe for most setups)
+        sed -i 's|#define HEATER_0_MAXTEMP 275|#define HEATER_0_MAXTEMP 300|' Configuration.h
+        sed -i 's|#define BED_MAXTEMP 150|#define BED_MAXTEMP 120|' Configuration.h
+
+        # Z homing direction (down is already default, but force it)
+        sed -i 's|#define Z_HOME_DIR -1|#define Z_HOME_DIR -1|' Configuration.h
 
     - name: Build firmware
       working-directory: Marlin
