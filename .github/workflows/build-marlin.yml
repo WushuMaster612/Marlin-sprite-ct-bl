@@ -27,11 +27,12 @@ jobs:
     - name: Clone matching Configurations
       run: git clone --depth 1 --branch release-2.1.2.6 https://github.com/MarlinFirmware/Configurations.git
 
-    - name: Copy official example + your configs
+    - name: Prepare configuration
       run: |
-        # Start with a clean official Ender-3 Pro config as base
-        cp Configurations/config/examples/Creality/Ender-3\ Pro/CrealityV422/* Marlin/Marlin/ || true
-        # Overwrite with your files
+        # Start with official Ender-3 Pro + Creality 4.2.2 example
+        cp -r "Configurations/config/examples/Creality/Ender-3 Pro/CrealityV422/." Marlin/Marlin/
+        
+        # Overwrite with your custom files
         cp Configuration.h Marlin/Marlin/
         cp Configuration_adv.h Marlin/Marlin/
         cp _Bootscreen.h Marlin/Marlin/ 2>/dev/null || true
