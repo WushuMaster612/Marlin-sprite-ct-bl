@@ -1,0 +1,42 @@
+name: Build Marlin
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install PlatformIO
+      run: pip install -U platformio
+
+    - name: Clone Marlin
+      run: git clone --depth 1 --branch bugfix-2.1.x https://github.com/MarlinFirmware/Marlin.git
+
+    - name: Copy configs
+      run: |
+        cp Configuration.h Marlin/Marlin/
+        cp Configuration_adv.h Marlin/Marlin/
+        cp _Bootscreen.h Marlin/Marlin/ 2>/dev/null || true
+        cp _Statusscreen.h Marlin/Marlin/ 2>/dev/null || true
+
+    - name: Build firmware
+      working-directory: Marlin
+      run: pio run -e STM32F103RE_creality
+
+    - name: Upload firmware
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware
+        path: Marlin/.pio/build/STM32F103RE_creality/*.bin
