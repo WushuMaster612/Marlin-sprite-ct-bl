@@ -21,8 +21,8 @@ jobs:
     - name: Install PlatformIO
       run: pip install -U platformio
 
-    - name: Clone Marlin
-      run: git clone --depth 1 --branch bugfix-2.1.x https://github.com/MarlinFirmware/Marlin.git
+    - name: Clone Marlin (stable 2.1.2.x)
+      run: git clone --depth 1 --branch 2.1.2.x https://github.com/MarlinFirmware/Marlin.git
 
     - name: Copy configs
       run: |
